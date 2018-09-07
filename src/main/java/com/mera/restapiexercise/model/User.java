@@ -1,11 +1,22 @@
 package com.mera.restapiexercise.model;
 
+import javax.persistence.*;
 import java.util.UUID;
 
+@Entity
+@Table(name = "users")
 public class User {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private UUID id;
+
     private String name;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "group_id")
     private Group group;
+
 
     public User() {}
 
@@ -27,5 +38,12 @@ public class User {
 
     public void setGroup(Group group) {
         this.group = group;
+    }
+
+    @Override
+    public String toString() {
+        return "User[id: " + id +
+                ", name: " + name +
+                "]";
     }
 }
