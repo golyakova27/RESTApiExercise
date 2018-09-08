@@ -5,26 +5,32 @@ import com.mera.restapiexercise.model.Group;
 import java.io.Serializable;
 import java.util.UUID;
 
-public class GroupGetResponse implements Serializable {
-    private UUID uuid;
+public class GroupRsp implements Serializable {
+    private UUID id;
     private String name;
-    private String description;
+    private String description = "Entity not found";
 
-    public GroupGetResponse() {
+    public GroupRsp() {
     }
 
-    public GroupGetResponse(Group group) {
-        uuid = group.getId();
+    public GroupRsp(Group group) {
+        id = group.getId();
         name = group.getName();
         description = group.getDescription();
     }
 
-    public UUID getUuid() {
-        return uuid;
+    public void setGroup(Group group) {
+        id = group.getId();
+        name = group.getName();
+        description = group.getDescription();
     }
 
-    public void setUuid(UUID uuid) {
-        this.uuid = uuid;
+    public UUID getId() {
+        return id;
+    }
+
+    public void setId(UUID id) {
+        this.id = id;
     }
 
     public String getName() {
