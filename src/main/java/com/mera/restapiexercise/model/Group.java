@@ -1,7 +1,5 @@
 package com.mera.restapiexercise.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.List;
@@ -20,7 +18,6 @@ public class Group implements Serializable{
     private String description;
 
     @OneToMany(mappedBy = "group", cascade = CascadeType.ALL)
-    @JsonIgnore
     private List<User> users;
 
 
