@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
@@ -34,7 +33,7 @@ public class GroupController {
             groupRsp.setGroup(groupRepository.getOne(UUID.fromString(uuid)));
         }
         // если введено имя группы и по uuid ничего в БД не найдено
-        if (name != null) {
+        if (name != null && groupRsp.getName() == null) {
             Group group = groupRepository.getGroupByName(name);
             if (group != null) {
                 groupRsp.setGroup(group);
