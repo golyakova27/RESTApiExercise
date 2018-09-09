@@ -10,8 +10,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.persistence.EntityNotFoundException;
 import javax.validation.Valid;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -26,17 +28,13 @@ public class GroupController {
         // GroupRsp для ответов на запросы
         GroupRsp groupRsp = new GroupRsp();
 
-        // обрабатываю исключение, чтобы при неверно введённом uuid или его отсутствии
-        // была возможность продолжать искать по имени группы
-        if (uuid != null) {
-            try {
-                groupRsp.setGroup(groupRepository.getOne(UUID.fromString(uuid)));
-            } catch (EntityNotFoundException e) {
-                System.out.println(e);
-            }
+        // при неверно введённом uuid или его отсутствии
+        // продолжим искать по имени группы
+        if (uuid != null && groupRepository.existsById(UUID.fromString(uuid))) {
+            groupRsp.setGroup(groupRepository.getOne(UUID.fromString(uuid)));
         }
         // если введено имя группы и по uuid ничего в БД не найдено
-        if (name != null && groupRsp.getName() == null) {
+        if (name != null) {
             Group group = groupRepository.getGroupByName(name);
             if (group != null) {
                 groupRsp.setGroup(group);
@@ -49,6 +47,17 @@ public class GroupController {
         return groupRsp;
     }
 
+    @GetMapping("/groups")
+    public List<GroupRsp> getAllGroups() {
+        List<Group> groups = groupRepository.findAll();
+        List<GroupRsp> groupsRsp = new ArrayList<>();
+        for (Group group : groups) {
+            groupsRsp.add(new GroupRsp(group));
+        }
+
+        return groupsRsp;
+    }
+
     @PostMapping("/group")
     @ResponseStatus(HttpStatus.CREATED)
     public GroupRsp createGroup(@Valid @RequestBody Group group) {
@@ -58,6 +67,7 @@ public class GroupController {
         }
         Group new_group = groupRepository.save(group);
         System.out.println(new_group);
+
         return new GroupRsp(new_group);
     }
 
@@ -68,20 +78,20 @@ public class GroupController {
         if (groupRepository.getGroupByName(groupRequest.getName()) != null) {
             throw new NameAlreadyTakenException("This name is already in use");
         }
-        return groupRepository.findById(groupId)
-                .map(group -> {
-                    group.setName(groupRequest.getName());
-                    group.setDescription(groupRequest.getDescription());
-                    return new GroupRsp(groupRepository.save(group)) ;
-                }).orElseThrow(() -> new ResourceNotFoundException("Group not found with id " + groupId));
+
+        return groupRepository.findById(groupId).map(group -> {
+            group.setName(groupRequest.getName());
+            group.setDescription(groupRequest.getDescription());
+            return new GroupRsp(groupRepository.save(group)) ;
+        }).orElseThrow(() -> new ResourceNotFoundException("Group not found with id " + groupId));
     }
 
     @DeleteMapping("/group/{groupId}")
     public ResponseEntity<?> deleteGroup(@PathVariable UUID groupId) {
-        return groupRepository.findById(groupId)
-                .map(group -> {
-                    groupRepository.delete(group);
-                    return ResponseEntity.ok().build();
-                }).orElseThrow(() -> new ResourceNotFoundException("Group not found with id " + groupId));
+
+        return groupRepository.findById(groupId).map(group -> {
+            groupRepository.delete(group);
+            return ResponseEntity.ok().build();
+        }).orElseThrow(() -> new ResourceNotFoundException("Group not found with id " + groupId));
     }
 }

@@ -17,7 +17,7 @@ public class Group implements Serializable{
 
     private String description;
 
-    @OneToMany(mappedBy = "group", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "group", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<User> users;
 
 

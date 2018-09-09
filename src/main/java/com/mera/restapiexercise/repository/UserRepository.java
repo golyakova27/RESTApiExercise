@@ -10,5 +10,6 @@ import java.util.UUID;
 @Repository
 public interface UserRepository extends JpaRepository<User, UUID> {
     List<User> findByGroupId(UUID groupId);
-    User getUserByName(String name);
+    //User getUserByName(String name);
+    List<User> getUserByName(String name);
 }
